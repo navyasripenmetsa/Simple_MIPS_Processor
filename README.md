@@ -4,7 +4,7 @@ A fully functional **single-cycle MIPS processor** built from scratch in Logisim
 
 ---
 
-## 📌 Overview
+## Overview
 
 This project implements a complete **32-bit single-cycle MIPS processor** with a modular, subcircuit-based architecture. The processor fetches instructions from dedicated Instruction Memory using a Program Counter, executes them through a custom ALU and Control Unit, and reads/writes data to a separate Data Memory — all coordinated by precisely generated control signals.
 
@@ -12,7 +12,7 @@ This project implements a complete **32-bit single-cycle MIPS processor** with a
 
 ---
 
-## ✅ Supported Instructions
+## Supported Instructions
 
 | Type | Instructions |
 |------|-------------|
@@ -24,13 +24,13 @@ This project implements a complete **32-bit single-cycle MIPS processor** with a
 
 ---
 
-## 🏗️ Architecture & Components
+## Architecture & Components
 
 The processor is built as a collection of modular subcircuits, each responsible for a specific stage or function of the datapath.
 
 ---
 
-### 🔁 Program Counter (PC)
+### Program Counter (PC)
 The PC is a 32-bit register that holds the address of the currently executing instruction. It updates every clock cycle based on the `PCSrc` control signal:
 
 | PCSrc | Next PC Value |
@@ -42,12 +42,12 @@ The lower bits `PC[11:2]` are used as the 10-bit word-aligned address into Instr
 
 ---
 
-### 📦 Instruction Memory
+### Instruction Memory
 Implemented using a Logisim RAM component (10-bit address width). Operates in **read-only mode** during execution — instructions are loaded once and fetched every cycle based on the PC. The 32-bit instruction output is split into fields: `opcode`, `rs`, `rt`, `rd`, `funct`, and `immediate`.
 
 ---
 
-### 🎛️ Control Unit
+### Control Unit
 Takes the 6-bit **opcode** as input and generates all datapath control signals. Each instruction is decoded by a dedicated AND gate (with inverted bits for 0s, direct bits for 1s), and OR gates combine these to produce each signal.
 
 | Signal | Purpose |
@@ -63,7 +63,7 @@ Takes the 6-bit **opcode** as input and generates all datapath control signals. 
 
 ---
 
-### 🗂️ Register File
+### Register File
 A **32 × 32-bit** register file supporting two simultaneous reads and one synchronous write per clock cycle.
 
 - **Inputs:** `read_reg1`, `read_reg2` (5-bit), `write_reg` (5-bit), `write_data` (32-bit), `RegWrite`, `clock`
@@ -73,7 +73,7 @@ Provides operands to the ALU and stores computed results.
 
 ---
 
-### ➕ ALU (Arithmetic Logic Unit)
+### ALU (Arithmetic Logic Unit)
 Performs all arithmetic and logical operations on two 32-bit inputs, selected by the `ALUControl` signal:
 
 | Operation | Used By |
@@ -88,12 +88,12 @@ Also outputs a **Zero flag** — goes high when the result is zero, used by `beq
 
 ---
 
-### 🧠 ALU Control Unit
+### ALU Control Unit
 Decodes the fine-grained ALU operation from two inputs: the `ALUOp` signal from the Control Unit and the `funct` field of the instruction. For `andi`/`ori`, the opcode is additionally used to differentiate them (both share `ALUOp = 11`).
 
 ---
 
-### 🔀 Multiplexers
+### Multiplexers
 
 | MUX | Selection Logic |
 |-----|----------------|
@@ -104,27 +104,27 @@ Decodes the fine-grained ALU operation from two inputs: the `ALUOp` signal from 
 
 ---
 
-### 📐 Sign Extend
+### Sign Extend
 Extends a 16-bit immediate value (from the instruction) to a full 32-bit signed value. Used by `addi`, `lw`, `sw`, and `beq` for both arithmetic and branch offset computation.
 
 ---
 
-### ↩️ Left Shift by 2
+### Left Shift by 2
 Shifts the sign-extended branch offset left by 2 bits to convert the word offset to a byte offset, aligning it correctly for MIPS word-addressed branch targets.
 
 ---
 
-### 🌿 Branch Address Calculator
+### Branch Address Calculator
 Computes the branch target address: adds the left-shifted sign-extended offset to `PC + 4`. The result is fed into the Next PC MUX and selected when `PCSrc = 1`.
 
 ---
 
-### ⚡ Branch Control
+### Branch Control
 A simple AND gate combining the `Branch` signal (from the Control Unit) and the `Zero` flag (from the ALU) to produce `PCSrc`. Both must be high for the branch to be taken.
 
 ---
 
-### 💾 Data Memory
+### Data Memory
 Implemented using a Logisim RAM component (10-bit address from `ALU[11:2]` for word alignment).
 
 - **Write:** Activated by `MemWrite` (`sw` instruction) — stores `read_data2` from the Register File
@@ -133,7 +133,7 @@ Implemented using a Logisim RAM component (10-bit address from `ALU[11:2]` for w
 
 ---
 
-## 🧪 Test Programs & Verification
+### Test Programs & Verification
 
 ### Test 1 — Memory Store, Load & Arithmetic
 Stores values 10, 20, 30 into memory, loads them back into registers, adds them, and stores the final result (60) back to memory.
